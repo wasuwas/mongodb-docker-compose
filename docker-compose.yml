@@ -1,0 +1,36 @@
+# Ref: https://hub.docker.com/_/mongo
+version: '3.1'
+
+x-var: &db_password
+  REPLACE_HERE_MOGNODB_PASSWORD
+x-var: &db_user
+  REPLACE_HERE_MONGODB_USER
+x-var: &console_user
+  REPLACE_HERE_MOGNODB-EXPRESS_PASSWORD
+x-var: &console_password
+  REPLACE_HERE_MOGNODB-EXPRESS_PASSWORD
+
+services:
+  mongo:
+    image: mongo:4.4.1
+    restart: always
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: *db_user
+      MONGO_INITDB_ROOT_PASSWORD: *db_password
+    ports:
+      - 27017:27017
+    volumes:
+      - ./db:/data/db
+      - ./configdb:/data/configdb
+  mongo-express:
+    image: mongo-express
+    restart: always
+    ports:
+      - 8081:8081
+    environment:
+      ME_CONFIG_BASICAUTH_USERNAME: *console_user
+      ME_CONFIG_BASICAUTH_PASSWORD: *console_password
+      ME_CONFIG_MONGODB_ADMINUSERNAME: *db_user
+      ME_CONFIG_MONGODB_ADMINPASSWORD: *db_password
+    depends_on:
+      - mongo
